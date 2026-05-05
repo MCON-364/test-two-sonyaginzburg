@@ -3,8 +3,12 @@ package edu.touro.las.mcon364.test2;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReadWriteLock;
+import java.util.concurrent.locks.ReentrantLock;
+import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 /**
  * Problem 2 of 3
@@ -46,10 +50,10 @@ public class TaskDispatcher {
     public static final int POOL_SIZE = 4;
 
     // TODO 1: replace null with an appropriate class
-    private final ExecutorService pool = null;
+    private final ExecutorService pool = Executors.newFixedThreadPool(POOL_SIZE);
 
     // TODO 2: replace null — which Lock implementation lets you lock and unlock explicitly?
-    private final Lock lock = null;
+    private final Lock lock = new ReentrantLock();
 
     // provided — do not change
     private final List<String> results = new ArrayList<>();
@@ -62,28 +66,38 @@ public class TaskDispatcher {
      *     (c) return the result
      *   Give back a handle to each piece of work so the caller can retrieve
      *   the results later. Do not wait for the results here.
-     *   You have to use streams!
+     *   You have to use streams! idk how to use streams here
      */
     public List<Future<String>> dispatch(List<String> tasks) {
         // TODO 3
-        return null; //placeholder
+      //  return tasks.stream().map()
     }
 
     public void recordResult(String result) {
         //TODO 4
+        lock.lock();
+        try {
+            results.add(result);
+        } finally {
+            lock.unlock();
+        }
     }
 
     public void shutdown() throws InterruptedException {
         //TODO 5
+        pool.shutdown();
     }
 
     public List<String> getResults() {
         //TODO 6
-        return null; //placeholder
+        synchronized (results){
+            return List.copyOf(results);
+        }
     }
 
     public int getCompletedCount() {
         //TODO 6
+        //return completedCount.get();
         return 0; //placeholder
     }
 
